@@ -37,6 +37,7 @@ func InsertUser(w http.ResponseWriter, r *http.Request) {
 		response.Status = 500
 		response.Message = "An internal error occurred in the server"
 		response.Data = user
+		log.Fatal(errQuery.Error())
 	} else {
 		response.Status = 201
 		response.Message = "New resource was created successfully"
@@ -71,6 +72,7 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 		if errQuery != nil {
 			response.Status = 500
 			response.Message = "Internal error occurred in the server"
+			log.Fatal(errQuery.Error())
 		} else {
 			response.Status = 200
 			response.Message = "The request was successful"
@@ -108,6 +110,7 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 		if errQuery != nil {
 			response.Status = 500
 			response.Message = "Internal error occurred in the server"
+			log.Fatal(errQuery.Error())
 		} else {
 			response.Status = 200
 			response.Message = "The request was successful"
@@ -186,6 +189,7 @@ func InsertTransaction(w http.ResponseWriter, r *http.Request) {
 		response.Status = 500
 		response.Message = "An internal error occurred in the server"
 		response.Data = transaction
+		log.Fatal(errQuery.Error())
 	} else {
 		response.Status = 201
 		response.Message = "New resource was created successfully"
@@ -221,6 +225,7 @@ func UpdateTransaction(w http.ResponseWriter, r *http.Request) {
 		if errQuery != nil {
 			response.Status = 500
 			response.Message = "Internal error occurred in the server"
+			log.Fatal(errQuery.Error())
 		} else {
 			response.Status = 200
 			response.Message = "The request was successful"
@@ -257,6 +262,7 @@ func DeleteTransaction(w http.ResponseWriter, r *http.Request) {
 		if errQuery != nil {
 			response.Status = 500
 			response.Message = "Internal error occurred in the server"
+			log.Fatal(errQuery.Error())
 		} else {
 			response.Status = 200
 			response.Message = "The request was successful"
@@ -334,6 +340,7 @@ func InsertProduct(w http.ResponseWriter, r *http.Request) {
 		response.Status = 500
 		response.Message = "An internal error occurred in the server"
 		response.Data = product
+		log.Fatal(errQuery.Error())
 	} else {
 		response.Status = 201
 		response.Message = "New resource was created successfully"
@@ -369,6 +376,7 @@ func DeleteProduct(w http.ResponseWriter, r *http.Request) {
 		if errQuery != nil {
 			response.Status = 500
 			response.Message = "Internal error occurred in the server"
+			log.Fatal(errQuery.Error())
 		} else {
 			response.Status = 200
 			response.Message = "The request was successful"
@@ -409,6 +417,7 @@ func UpdateProduct(w http.ResponseWriter, r *http.Request) {
 		if errQuery != nil {
 			response.Status = 500
 			response.Message = "Internal error occurred in the server"
+			log.Fatal(errQuery.Error())
 		} else {
 			response.Status = 200
 			response.Message = "The request was successful"
