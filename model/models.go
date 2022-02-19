@@ -37,10 +37,22 @@ type UsersResponse struct {
 	Data    []User `json : "Data"`
 }
 
+type TransactionResponse struct {
+	Status  int         `json : "Status"`
+	Message string      `json : "Message"'`
+	Data    Transaction `json : "Data"`
+}
+
 type TransactionsResponse struct {
 	Status  int           `json : "Status"`
 	Message string        `json : "Message"'`
 	Data    []Transaction `json : "Data"`
+}
+
+type ProductResponse struct {
+	Status  int     `json : "Status"`
+	Message string  `json : "Message"'`
+	Data    Product `json : "Data"`
 }
 
 type ProductsResponse struct {
