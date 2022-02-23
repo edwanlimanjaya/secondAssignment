@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -11,7 +10,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func InsertUser(w http.ResponseWriter, r *http.Request) {
+func InsertProduct(w http.ResponseWriter, r *http.Request) {
 	db := Connect()
 	defer db.Close()
 
@@ -21,36 +20,34 @@ func InsertUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	name := r.Form.Get("name")
-	age, _ := strconv.Atoi(r.Form.Get("age"))
-	address := r.Form.Get("address")
+	name_products := r.Form.Get("name")
+	price, _ := strconv.Atoi(r.Form.Get("price"))
 
-	result, errQuery := db.Exec("Insert into table_user(name,age,address) values(?,?,?)",
-		name, age, address)
-	var user model.User
-	temp, _ := result.LastInsertId()
-	user.Id = int(temp)
-	user.Name = name
-	user.Age = age
-	user.Address = address
+	_, errQuery := db.Exec("Insert into table_product(name, price) values(?,?)",
+		name_products, price)
 
-	var response model.UserResponse
+	var response model.ProductResponse
+	var product model.Product
+
+	product.Name = name_products
+	product.Price = price
+
 	if errQuery != nil {
 		response.Status = 500
 		response.Message = "An internal error occurred in the server"
+		response.Data = product
 		log.Fatal(errQuery.Error())
 	} else {
 		response.Status = 201
 		response.Message = "New resource was created successfully"
-		response.Data = user
-		fmt.Println(user.Id)
+		response.Data = product
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
 }
 
-func DeleteUser(w http.ResponseWriter, r *http.Request) {
+func DeleteProduct(w http.ResponseWriter, r *http.Request) {
 	db := Connect()
 	defer db.Close()
 
@@ -61,12 +58,13 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	vars := mux.Vars(r)
-	userId := vars["user_id"]
 
-	var response model.UserResponse
+	product_id := vars["product_id"]
 
-	result, errQuery := db.Exec("Delete from table_user where id=?",
-		userId)
+	result, errQuery := db.Exec("Delete from table_product where id=?",
+		product_id)
+
+	var response model.ProductResponse
 
 	temp, _ := result.RowsAffected()
 
@@ -88,7 +86,7 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(response)
 }
 
-func UpdateUser(w http.ResponseWriter, r *http.Request) {
+func UpdateProduct(w http.ResponseWriter, r *http.Request) {
 	db := Connect()
 	defer db.Close()
 
@@ -97,14 +95,17 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		return
 	}
+
 	vars := mux.Vars(r)
-	userId := vars["user_id"]
 
-	name := r.Form.Get("name")
-	var response model.UserResponse
+	product_id := vars["product_id"]
 
-	result, errQuery := db.Exec("Update table_user set name=? where id=?",
-		name, userId)
+	price, _ := strconv.Atoi(r.Form.Get("price"))
+
+	result, errQuery := db.Exec("Update table_product set price=? where id=?",
+		price, product_id)
+
+	var response model.ProductResponse
 
 	temp, _ := result.RowsAffected()
 
@@ -126,38 +127,40 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(response)
 }
 
-func GetAllUser(w http.ResponseWriter, r *http.Request) {
+func GetAllProducts(w http.ResponseWriter, r *http.Request) {
 	db := Connect()
 	defer db.Close()
 
-	query := "SELECT * FROM table_user"
+	query := "Select * from table_product"
 
 	rows, err := db.Query(query)
+
 	if err != nil {
 		var response model.ErrorResponse
 		response.Status = 500
-		response.Message = "Internal server error"
+		response.Message = "Internal error occurred in the server"
 		log.Println(err)
 		return
 	}
 
-	var user model.User
-	var users []model.User
+	var product model.Product
+	var products []model.Product
+
 	for rows.Next() {
-		if err != rows.Scan(&user.Id, &user.Name, &user.Age, &user.Address) {
+		if err := rows.Scan(&product.Id, &product.Name, &product.Price); err != nil {
 			var response model.ErrorResponse
 			response.Status = 500
 			response.Message = "Internal error occurred in the server"
 			log.Fatal(err.Error())
 		} else {
-			users = append(users, user)
+			products = append(products, product)
 		}
 	}
 
-	var response model.UsersResponse
+	var response model.ProductsResponse
 	response.Status = 200
-	response.Message = "Request was successful"
-	response.Data = users
+	response.Message = "request was successful"
+	response.Data = products
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)

@@ -5,6 +5,8 @@ type User struct {
 	Name    string `json : "name"`
 	Age     int    `json : "age"`
 	Address string `json : "address"`
+	// Email    string `json :"email"`
+	// Password string `json : "password"`
 }
 
 type Transaction struct {

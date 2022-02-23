@@ -29,6 +29,6 @@ func main() {
 	router.HandleFunc("/update/transaction/{transaction_id}", controllers.UpdateTransaction).Methods("PUT")
 
 	http.Handle("/", router)
-	log.Println("Connected to port 8080")
-	log.Fatal(http.ListenAndServe(":8080", router))
+	log.Println("Connected to port 8000")
+	log.Fatal(http.ListenAndServe(":8000", router))
 }
