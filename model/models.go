@@ -1,25 +1,25 @@
 package model
 
 type User struct {
-	Id      int    `json : "id"`
-	Name    string `json : "name"`
-	Age     int    `json : "age"`
-	Address string `json : "address"`
-	// Email    string `json :"email"`
-	// Password string `json : "password"`
+	IdUser    int    `json : "idUser"`
+	Name_user string `json : "name_user"`
+	Age       int    `json : "age"`
+	Address   string `json : "address"`
+	Email     string `json :"email"`
+	Password  string `json : "password"`
 }
 
 type Transaction struct {
-	Id         int `json : "id"`
-	User_id    int `json : "user_id"`
-	Product_id int `json : "product_id"`
-	Quantity   int `json : "quanity"`
+	IdTransaction int `json : "idTranscation"`
+	User_id       int `json : "user_id"`
+	Product_id    int `json : "product_id"`
+	Quantity      int `json : "quanity"`
 }
 
 type Product struct {
-	Id    int    `json : "id"`
-	Name  string `json : "name"`
-	Price int    `json : "price"`
+	IdProduct    int    `json : "idProduct"`
+	Name_product string `json : "name_product"`
+	Price        int    `json : "price"`
 }
 
 type ErrorResponse struct {
@@ -45,6 +45,14 @@ type TransactionResponse struct {
 	Data    Transaction `json : "Data"`
 }
 
+type AllResponse struct {
+	Status             int         `json : "Status"`
+	Message            string      `json : "Message"'`
+	UserTransaction    User        `json : UserTransaction`
+	ProductTransaction Product     `json : ProductTransaction`
+	DataTransaction    Transaction `json : "DataTransaction"`
+}
+
 type TransactionsResponse struct {
 	Status  int           `json : "Status"`
 	Message string        `json : "Message"'`
@@ -61,4 +69,9 @@ type ProductsResponse struct {
 	Status  int       `json : "Status"`
 	Message string    `json : "Message"'`
 	Data    []Product `json : "Data"`
+}
+
+type LoginResponse struct {
+	Status  int    `json : "Status"`
+	Message string `json : "Message"`
 }

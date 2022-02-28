@@ -20,16 +20,18 @@ func InsertProduct(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	name_products := r.Form.Get("name")
+	name_product := r.Form.Get("name_product")
 	price, _ := strconv.Atoi(r.Form.Get("price"))
 
-	_, errQuery := db.Exec("Insert into table_product(name, price) values(?,?)",
-		name_products, price)
+	result, errQuery := db.Exec("Insert into table_product(name_product, price) values(?,?)",
+		name_product, price)
 
 	var response model.ProductResponse
 	var product model.Product
+	temp, _ := result.LastInsertId()
 
-	product.Name = name_products
+	product.IdProduct = int(temp)
+	product.Name_product = name_product
 	product.Price = price
 
 	if errQuery != nil {
@@ -61,7 +63,7 @@ func DeleteProduct(w http.ResponseWriter, r *http.Request) {
 
 	product_id := vars["product_id"]
 
-	result, errQuery := db.Exec("Delete from table_product where id=?",
+	result, errQuery := db.Exec("Delete from table_product where idProduct=?",
 		product_id)
 
 	var response model.ProductResponse
@@ -70,6 +72,7 @@ func DeleteProduct(w http.ResponseWriter, r *http.Request) {
 
 	if temp != 0 {
 		if errQuery != nil {
+			var response model.ErrorResponse
 			response.Status = 500
 			response.Message = "Internal error occurred in the server"
 			log.Fatal(errQuery.Error())
@@ -147,7 +150,7 @@ func GetAllProducts(w http.ResponseWriter, r *http.Request) {
 	var products []model.Product
 
 	for rows.Next() {
-		if err := rows.Scan(&product.Id, &product.Name, &product.Price); err != nil {
+		if err := rows.Scan(&product.IdProduct, &product.Name_product, &product.Price); err != nil {
 			var response model.ErrorResponse
 			response.Status = 500
 			response.Message = "Internal error occurred in the server"

@@ -24,15 +24,19 @@ func InsertUser(w http.ResponseWriter, r *http.Request) {
 	name := r.Form.Get("name")
 	age, _ := strconv.Atoi(r.Form.Get("age"))
 	address := r.Form.Get("address")
+	email := r.Form.Get("email")
+	password := r.Form.Get("password")
 
-	result, errQuery := db.Exec("Insert into table_user(name,age,address) values(?,?,?)",
-		name, age, address)
+	result, errQuery := db.Exec("Insert into table_user(name,age,address) values(?,?,?,?,?)",
+		name, age, address, email, password)
 	var user model.User
 	temp, _ := result.LastInsertId()
-	user.Id = int(temp)
-	user.Name = name
+	user.IdUser = int(temp)
+	user.Name_user = name
 	user.Age = age
 	user.Address = address
+	user.Email = email
+	user.Password = password
 
 	var response model.UserResponse
 	if errQuery != nil {
@@ -43,7 +47,7 @@ func InsertUser(w http.ResponseWriter, r *http.Request) {
 		response.Status = 201
 		response.Message = "New resource was created successfully"
 		response.Data = user
-		fmt.Println(user.Id)
+		fmt.Println(user.IdUser)
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -144,7 +148,7 @@ func GetAllUser(w http.ResponseWriter, r *http.Request) {
 	var user model.User
 	var users []model.User
 	for rows.Next() {
-		if err != rows.Scan(&user.Id, &user.Name, &user.Age, &user.Address) {
+		if err != rows.Scan(&user.IdUser, &user.Name_user, &user.Age, &user.Address, &user.Email, &user.Password) {
 			var response model.ErrorResponse
 			response.Status = 500
 			response.Message = "Internal error occurred in the server"
@@ -158,6 +162,41 @@ func GetAllUser(w http.ResponseWriter, r *http.Request) {
 	response.Status = 200
 	response.Message = "Request was successful"
 	response.Data = users
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
+}
+
+func LoginUser(w http.ResponseWriter, r *http.Request) {
+	db := Connect()
+	defer db.Close()
+
+	err := r.ParseForm()
+
+	if err != nil {
+		var response model.ErrorResponse
+		response.Status = 500
+		response.Message = "Internal server error"
+		log.Println(err)
+		return
+	}
+
+	email := r.Form.Get("email")
+	password := r.Form.Get("password")
+
+	_, errQuery := db.Exec(`SELECT * FROM table_user 
+	WHERE email = ? 
+	AND password = ?`, email, password)
+
+	var response model.LoginResponse
+	if errQuery != nil {
+		response.Status = 500
+		response.Message = "Internal server error"
+		log.Println(err)
+	} else {
+		response.Status = 200
+		response.Message = "The request was successful"
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
