@@ -179,34 +179,35 @@ func GetAllDetailTransactions(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	user_id := vars["user_id"]
 
-	rows, _ := db.Query(`SELECT table_user.idUser, table_user.name_user, table_user.age, table_user.address, table_product.idProduct, table_product.name_product, table_product.price, table_transaction.quantity 
-	FROM table_user 
-	INNER JOIN table_transaction 
-	ON table_user.idUser = table_transaction.user_id 
-	INNER JOIN table_product 
-	ON table_transaction.product_id = table_product.idProduct
-	WHERE table_user.idUser =?`, user_id)
+	//user_id := r.Form.Get("user_id")
 
 	var user model.User
 	var transaction model.Transaction
 	var product model.Product
 
-	for rows.Next() {
-		if errQuery := rows.Scan(&user.IdUser, &user.Name_user, &user.Age, &user.Address, &product.IdProduct, &product.Name_product, &product.Price, &transaction.Quantity); errQuery != nil {
-			var response model.ErrorResponse
-			response.Status = 500
-			response.Message = "Internal error occurred in the server"
-			log.Fatal(err.Error())
-		}
+	errQuery := db.QueryRow(`SELECT table_user.idUser, table_user.name_user, table_user.age, table_user.address, table_product.idProduct, table_product.name_product, table_product.price, table_transaction.quantity 
+	FROM table_user 
+	INNER JOIN table_transaction 
+	ON table_user.idUser = table_transaction.user_id 
+	INNER JOIN table_product 
+	ON table_transaction.product_id = table_product.idProduct
+	WHERE table_user.idUser =?`, user_id).Scan(&user.IdUser, &user.Name_user, &user.Age, &user.Address, &product.IdProduct, &product.Name_product, &product.Price, &transaction.Quantity)
+
+	if errQuery != nil {
+		var response model.ErrorResponse
+		response.Status = 404
+		response.Message = "Indicates that the targeted resource does not exist"
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
+	} else {
+		var response model.AllResponse
+		response.Status = 200
+		response.Message = "Request was successful"
+		response.UserTransaction = user
+		response.ProductTransaction = product
+		response.DataTransaction = transaction
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
 	}
 
-	var response model.AllResponse
-	response.Status = 200
-	response.Message = "Request was successful"
-	response.UserTransaction = user
-	response.ProductTransaction = product
-	response.DataTransaction = transaction
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
 }

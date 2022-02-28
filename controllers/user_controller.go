@@ -183,21 +183,27 @@ func LoginUser(w http.ResponseWriter, r *http.Request) {
 
 	email := r.Form.Get("email")
 	password := r.Form.Get("password")
+	var user model.User
 
-	_, errQuery := db.Exec(`SELECT * FROM table_user 
+	errQuery := db.QueryRow(`SELECT * FROM table_user 
 	WHERE email = ? 
-	AND password = ?`, email, password)
+	AND password = ?`, email, password).Scan(&user.IdUser, &user.Name_user, &user.Age, &user.Address, &user.Email, &user.Password)
 
-	var response model.LoginResponse
+	fmt.Print(errQuery)
+
 	if errQuery != nil {
-		response.Status = 500
-		response.Message = "Internal server error"
-		log.Println(err)
+		var response model.ErrorResponse
+		response.Status = 404
+		response.Message = "Indicates that the targeted resource does not exist"
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
 	} else {
+		var response model.UserResponse
 		response.Status = 200
 		response.Message = "The request was successful"
+		response.Data = user
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(response)
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
 }

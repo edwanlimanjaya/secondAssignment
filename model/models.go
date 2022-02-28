@@ -70,8 +70,3 @@ type ProductsResponse struct {
 	Message string    `json : "Message"'`
 	Data    []Product `json : "Data"`
 }
-
-type LoginResponse struct {
-	Status  int    `json : "Status"`
-	Message string `json : "Message"`
-}
