@@ -7,6 +7,7 @@ type User struct {
 	Address   string `json : "address"`
 	Email     string `json :"email"`
 	Password  string `json : "password"`
+	User_type int    `json : "user_type"`
 }
 
 type Transaction struct {
@@ -69,4 +70,9 @@ type ProductsResponse struct {
 	Status  int       `json : "Status"`
 	Message string    `json : "Message"'`
 	Data    []Product `json : "Data"`
+}
+
+type Response struct {
+	Status  int    `json : "Status"`
+	Message string `json : "Message"'`
 }
